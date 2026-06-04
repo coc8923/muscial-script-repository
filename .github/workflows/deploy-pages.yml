@@ -1,0 +1,41 @@
+name: Deploy MelodyNote to GitHub Pages
+
+# app/ 폴더를 GitHub Pages로 자동 배포합니다.
+on:
+  push:
+    branches:
+      - main
+      - claude/idea-music-app-concept-ApECx
+  workflow_dispatch: # 수동 실행 버튼
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 동시 배포 방지 (마지막 것만 반영)
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload app folder
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./app
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
