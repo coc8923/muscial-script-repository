@@ -1,0 +1,47 @@
+{
+  "name": "MelodyNote — 아이디어를 음악으로",
+  "short_name": "MelodyNote",
+  "description": "번뜩이는 생각과 흥얼거리는 멜로디를 바로 기록하고 음악으로 발전시키는 앱",
+  "lang": "ko",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0d0d14",
+  "theme_color": "#0d0d14",
+  "categories": ["music", "productivity", "lifestyle"],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "보이스 녹음",
+      "short_name": "녹음",
+      "description": "멜로디를 바로 녹음하기",
+      "url": "./index.html?action=voice"
+    },
+    {
+      "name": "텍스트 메모",
+      "short_name": "메모",
+      "description": "아이디어를 바로 적기",
+      "url": "./index.html?action=text"
+    }
+  ]
+}

@@ -2,8 +2,21 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>MelodyNote — 아이디어를 음악으로</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0d0d14" />
+  <meta name="description" content="번뜩이는 생각과 흥얼거리는 멜로디를 바로 기록하고 음악으로 발전시키는 앱" />
+
+  <!-- iOS 홈 화면 추가 지원 -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="MelodyNote" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -225,5 +238,15 @@
   </div>
 
   <script src="app.js"></script>
+  <script>
+    // 서비스워커 등록 (오프라인 + 홈 화면 설치 지원)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch((err) => {
+          console.warn('서비스워커 등록 실패:', err);
+        });
+      });
+    }
+  </script>
 </body>
 </html>
