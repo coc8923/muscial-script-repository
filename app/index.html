@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MelodyNote — 아이디어를 음악으로</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">♪</span>
+        <span class="logo-text">MelodyNote</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn-icon" id="btnSearch" title="검색">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </button>
+        <button class="btn-icon" id="btnFilter" title="필터">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Search Bar (hidden by default) -->
+  <div class="search-bar" id="searchBar">
+    <input type="text" id="searchInput" placeholder="아이디어, 가사, 태그 검색..." />
+    <button class="btn-close-search" id="btnCloseSearch">✕</button>
+  </div>
+
+  <!-- Filter Panel -->
+  <div class="filter-panel" id="filterPanel">
+    <div class="filter-section">
+      <h4>유형</h4>
+      <div class="filter-chips">
+        <button class="chip active" data-filter-type="all">전체</button>
+        <button class="chip" data-filter-type="text">텍스트</button>
+        <button class="chip" data-filter-type="voice">보이스</button>
+        <button class="chip" data-filter-type="melody">멜로디</button>
+      </div>
+    </div>
+    <div class="filter-section">
+      <h4>무드</h4>
+      <div class="filter-chips">
+        <button class="chip" data-filter-mood="happy">😊 신나는</button>
+        <button class="chip" data-filter-mood="sad">😢 슬픈</button>
+        <button class="chip" data-filter-mood="chill">😌 잔잔한</button>
+        <button class="chip" data-filter-mood="energetic">⚡ 에너지</button>
+        <button class="chip" data-filter-mood="dreamy">✨ 몽환적</button>
+        <button class="chip" data-filter-mood="romantic">💕 로맨틱</button>
+      </div>
+    </div>
+    <div class="filter-section">
+      <h4>BPM 범위</h4>
+      <div class="bpm-range">
+        <input type="range" id="bpmMin" min="40" max="200" value="40" />
+        <input type="range" id="bpmMax" min="40" max="200" value="200" />
+        <span id="bpmRangeLabel">40 – 200 BPM</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+      <div class="stat"><span id="statTotal">0</span><small>총 아이디어</small></div>
+      <div class="stat"><span id="statToday">0</span><small>오늘</small></div>
+      <div class="stat"><span id="statVoice">0</span><small>보이스메모</small></div>
+    </div>
+
+    <!-- Ideas Grid -->
+    <div class="ideas-grid" id="ideasGrid">
+      <!-- cards injected by JS -->
+    </div>
+
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">🎵</div>
+      <h2>첫 번째 아이디어를 기록해보세요</h2>
+      <p>멜로디, 가사, 번뜩이는 생각 — 무엇이든 바로 포착하세요</p>
+      <button class="btn-primary" id="btnEmptyCapture">지금 시작하기</button>
+    </div>
+  </main>
+
+  <!-- FAB (Floating Action Button) -->
+  <button class="fab" id="fabBtn" title="새 아이디어">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+
+  <!-- === CAPTURE MODAL === -->
+  <div class="modal-overlay" id="captureModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>새 아이디어</h2>
+        <button class="btn-close" id="btnCloseModal">✕</button>
+      </div>
+
+      <!-- Type Selector -->
+      <div class="type-selector">
+        <button class="type-btn active" data-type="text">
+          <span class="type-icon">📝</span>
+          <span>텍스트</span>
+        </button>
+        <button class="type-btn" data-type="voice">
+          <span class="type-icon">🎤</span>
+          <span>보이스</span>
+        </button>
+        <button class="type-btn" data-type="melody">
+          <span class="type-icon">🎹</span>
+          <span>멜로디</span>
+        </button>
+      </div>
+
+      <!-- Title -->
+      <input type="text" class="idea-title-input" id="ideaTitle" placeholder="제목 (선택)" maxlength="60" />
+
+      <!-- TEXT PANEL -->
+      <div class="panel" id="panelText">
+        <textarea class="idea-textarea" id="ideaText" placeholder="가사, 아이디어, 떠오르는 생각을 자유롭게 적어보세요...&#10;&#10;영감이 사라지기 전에 빠르게 기록하세요 ✍️" rows="6"></textarea>
+      </div>
+
+      <!-- VOICE PANEL -->
+      <div class="panel hidden" id="panelVoice">
+        <div class="voice-recorder">
+          <div class="waveform-container">
+            <canvas id="waveformCanvas" width="500" height="80"></canvas>
+          </div>
+          <div class="recorder-timer" id="recorderTimer">00:00</div>
+          <div class="recorder-controls">
+            <button class="btn-record" id="btnRecord">
+              <span class="record-dot"></span>
+              <span id="recordLabel">녹음 시작</span>
+            </button>
+            <button class="btn-play-voice hidden" id="btnPlayVoice">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              듣기
+            </button>
+            <button class="btn-discard hidden" id="btnDiscardVoice">다시 녹음</button>
+          </div>
+          <div class="voice-hint">멜로디를 흥얼거리거나 아이디어를 말로 녹음하세요</div>
+        </div>
+      </div>
+
+      <!-- MELODY PANEL -->
+      <div class="panel hidden" id="panelMelody">
+        <div class="melody-builder">
+          <!-- Piano Keys -->
+          <div class="piano-section">
+            <div class="piano-label">피아노 터치</div>
+            <div class="piano" id="piano"></div>
+          </div>
+
+          <!-- Step Sequencer -->
+          <div class="sequencer-section">
+            <div class="sequencer-header">
+              <span class="piano-label">스텝 시퀀서</span>
+              <div class="seq-controls">
+                <button class="btn-seq" id="btnSeqPlay">▶ 재생</button>
+                <button class="btn-seq" id="btnSeqStop">■ 정지</button>
+                <button class="btn-seq btn-danger" id="btnSeqClear">지우기</button>
+              </div>
+            </div>
+            <div class="sequencer" id="sequencer"></div>
+          </div>
+
+          <!-- BPM Control -->
+          <div class="bpm-control">
+            <label>BPM</label>
+            <input type="number" id="bpmInput" value="120" min="40" max="250" />
+            <button class="btn-tap" id="btnTap">탭 템포</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mood Tags -->
+      <div class="meta-section">
+        <label class="meta-label">무드</label>
+        <div class="mood-chips">
+          <button class="mood-chip" data-mood="happy">😊 신나는</button>
+          <button class="mood-chip" data-mood="sad">😢 슬픈</button>
+          <button class="mood-chip" data-mood="chill">😌 잔잔한</button>
+          <button class="mood-chip" data-mood="energetic">⚡ 에너지</button>
+          <button class="mood-chip" data-mood="dreamy">✨ 몽환적</button>
+          <button class="mood-chip" data-mood="romantic">💕 로맨틱</button>
+        </div>
+      </div>
+
+      <!-- Genre Tags -->
+      <div class="meta-section">
+        <label class="meta-label">장르</label>
+        <div class="genre-chips">
+          <button class="genre-chip" data-genre="pop">Pop</button>
+          <button class="genre-chip" data-genre="kpop">K-Pop</button>
+          <button class="genre-chip" data-genre="rnb">R&B</button>
+          <button class="genre-chip" data-genre="hiphop">Hip-Hop</button>
+          <button class="genre-chip" data-genre="indie">Indie</button>
+          <button class="genre-chip" data-genre="ballad">발라드</button>
+          <button class="genre-chip" data-genre="edm">EDM</button>
+          <button class="genre-chip" data-genre="jazz">Jazz</button>
+        </div>
+      </div>
+
+      <!-- Save Button -->
+      <button class="btn-save" id="btnSave">아이디어 저장</button>
+    </div>
+  </div>
+
+  <!-- === DETAIL MODAL === -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="detailTitle">아이디어 상세</h2>
+        <div class="modal-header-actions">
+          <button class="btn-icon btn-delete-idea" id="btnDeleteIdea" title="삭제">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+          <button class="btn-close" id="btnCloseDetail">✕</button>
+        </div>
+      </div>
+      <div id="detailContent"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
