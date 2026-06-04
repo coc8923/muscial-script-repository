@@ -691,9 +691,51 @@ function updateBpmRange() {
 bpmMinEl.addEventListener('input', updateBpmRange);
 bpmMaxEl.addEventListener('input', updateBpmRange);
 
+// ─── PWA: 홈 화면 설치 프롬프트 ────────────────────────────────
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  showInstallBanner();
+});
+
+function showInstallBanner() {
+  if (document.getElementById('installBanner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'installBanner';
+  banner.style.cssText = 'position:fixed;left:50%;bottom:100px;transform:translateX(-50%);z-index:400;background:var(--surface);border:1px solid var(--accent);border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,0.5);max-width:90vw;';
+  banner.innerHTML = `
+    <span style="font-size:24px;">♪</span>
+    <span style="font-size:13px;color:var(--text);">홈 화면에 추가하고 앱처럼 사용하세요</span>
+    <button id="installBtn" style="background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;padding:7px 14px;cursor:pointer;">설치</button>
+    <button id="installClose" style="background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;">✕</button>
+  `;
+  document.body.appendChild(banner);
+  document.getElementById('installBtn').addEventListener('click', async () => {
+    if (!deferredInstallPrompt) return;
+    deferredInstallPrompt.prompt();
+    await deferredInstallPrompt.userChoice;
+    deferredInstallPrompt = null;
+    banner.remove();
+  });
+  document.getElementById('installClose').addEventListener('click', () => banner.remove());
+}
+
+// ─── 앱 단축키 (manifest shortcuts) 처리 ───────────────────────
+function handleLaunchAction() {
+  const params = new URLSearchParams(window.location.search);
+  const action = params.get('action');
+  if (action === 'voice' || action === 'text' || action === 'melody') {
+    openCaptureModal();
+    const typeBtn = document.querySelector(`.type-btn[data-type="${action}"]`);
+    if (typeBtn) typeBtn.click();
+  }
+}
+
 // ─── Init ─────────────────────────────────────────────────────
 buildPiano();
 renderGrid();
+handleLaunchAction();
 
 // Sample idea on first launch
 if (ideas.length === 0) {
