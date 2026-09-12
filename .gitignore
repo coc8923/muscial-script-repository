@@ -1,0 +1,30 @@
+# ─── macOS가 자동으로 만드는 파일 ───
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# ─── Windows가 자동으로 만드는 파일 ───
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ─── 한글/워드 임시파일 ───
+~$*.doc*
+~$*.xls*
+~$*.ppt*
+*.hwp.bak
+*.asv
+
+# ─── 편집기 임시파일 ───
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# ─── Claude Code 개인 설정 ───
+.claude/settings.local.json
